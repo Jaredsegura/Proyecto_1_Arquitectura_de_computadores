@@ -1,0 +1,27 @@
+Breakpoint 1 at 0x1ac4: file asm/vector/stats_vector.asm, line 222.
+Breakpoint 2 at 0x1b18: file asm/vector/stats_vector.asm, line 257.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 1, normalize_array () at asm/vector/stats_vector.asm:222
+222	    vxorps   xmm2, xmm2, xmm2
+
+=== Entrada a normalize_array: mean (xmm0) y stddev (xmm1) como escalares ===
+$1 = 14.8655205
+$2 = 69.5398941
+223	    vucomiss xmm1, xmm2
+224	    je       .na_copy               ; stddev == 0.0 -> copiar tal cual
+226	    vbroadcastss ymm2, xmm0         ; ymm2 = mean en los 8 carriles
+227	    vbroadcastss ymm3, xmm1         ; ymm3 = stddev en los 8 carriles
+229	    xor     eax, eax                ; eax = i = 0
+
+=== Tras 'vbroadcastss ymm2, xmm0' y 'vbroadcastss ymm3, xmm1': mean/stddev replicados en los 8 carriles ===
+$3 = {14.8655205, 14.8655205, 14.8655205, 14.8655205, 14.8655205, 14.8655205, 14.8655205, 14.8655205}
+$4 = {69.5398941, 69.5398941, 69.5398941, 69.5398941, 69.5398941, 69.5398941, 69.5398941, 69.5398941}
+
+=== Arreglo de salida (out[0..7]) al final de normalize_array ===
+
+Breakpoint 2, normalize_array.na_done () at asm/vector/stats_vector.asm:257
+257	    vzeroupper
+0x555555559480:	1.09780633	1.07420325	-1.48914886	-1.40769744
+0x555555559490:	0.751140893	0.464891076	0.274382919	-0.76557821
